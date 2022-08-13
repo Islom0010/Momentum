@@ -10,6 +10,9 @@ const city = document.querySelector(".city");
 const weatherIcon = document.querySelector(".weather-icon");
 const temperature = document.querySelector(".temperature");
 const weatherDescription = document.querySelector(".weather-description");
+const changeQuote = document.querySelector(".change-quote");
+const quote = document.querySelector(".quote");
+const author = document.querySelector(".author");
 
 // Time
 const newDate = new Date();
@@ -38,9 +41,11 @@ showDate();
 // Greeting
 const hours = newDate.getHours();
 const getTimeOfDay = () => {
-  if (hours < 10) return "morning";
+  if (hours < 6) return "night";
+  else if (hours < 10) return "morning";
   else if (hours < 18) return "day";
-  else if (hours < 25) return "evening";
+  else if (hours < 21) return "evening";
+  else if (hours < 25) return "night";
   setTimeout(getTimeOfDay, 1000);
 };
 const timeOfDay = getTimeOfDay();
@@ -97,9 +102,26 @@ async function getWeather() {
   const res = await fetch(url);
   const data = await res.json();
 
-  weatherIcon.className = 'weather-icon owf';
+  weatherIcon.className = "weather-icon owf";
   weatherIcon.classList.add(`owf-${data.weather[0].id}`);
   temperature.textContent = `${data.main.temp}°C`;
   weatherDescription.textContent = data.weather[0].description;
 }
 getWeather();
+
+// Quotes
+
+async function getQuotes() {
+  const quotes = "data.json";
+  const res = await fetch(quotes);
+  const data = await res.json();
+
+ let n = Math.floor(Math.random() * 11);
+ console.log(n);
+  
+  quote.textContent = `"${data[n].text}"`;
+  author.textContent = `${data[n].author}`;
+}
+getQuotes();
+
+changeQuote.addEventListener("click", getQuotes)
