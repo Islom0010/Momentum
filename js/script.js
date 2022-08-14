@@ -42,9 +42,9 @@ showDate();
 const hours = newDate.getHours();
 const getTimeOfDay = () => {
   if (hours < 6) return "night";
-  else if (hours < 10) return "morning";
-  else if (hours < 18) return "day";
-  else if (hours < 21) return "evening";
+  else if (hours < 12) return "morning";
+  else if (hours < 18) return "afternoon";
+  else if (hours < 24) return "evening";
   else if (hours < 25) return "night";
   setTimeout(getTimeOfDay, 1000);
 };
@@ -55,15 +55,18 @@ greetingSpam.textContent = greetingText;
 // Background
 let randomNum;
 const getRandomNum = () => {
-  randomNum = Math.floor(Math.random() * 11 + 1);
+  randomNum = Math.floor(Math.random() * 11 + 1).toString();
 };
 getRandomNum();
 let bgNum;
 const getBgNum = () => {
-  bgNum = randomNum.toString().padStart(2, "0");
+  bgNum = randomNum.padStart(2, "0");
 };
 getBgNum();
-// let url = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`;
+
+console.log(bgNum);
+bgNum = Number(bgNum)
+
 const setBg = () => {
   const img = new Image();
   img.src = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`;
@@ -75,20 +78,24 @@ setBg();
 
 // body.style.background = `url("${bgUrl}")`;
 const getSlideNext = () => {
-  if (randomNum < 20) {
+  if (bgNum < 20) {
     bgNum++;
-  } else if (bgNum > 20) {
+  } else if (bgNum > 19) {
     bgNum = 1;
   }
+  console.log(`bgNum:${bgNum}
+  randomNum:${randomNum}`);
   setBg();
 };
-
+ 
 const getSlidePrev = () => {
-  if (bgNum < 21 || bgNum > 0) {
+  if (bgNum > 1 && bgNum < 21) {
     bgNum -= 1;
-  } else if (bgNum < 1) {
+  } else if (bgNum == 1) {
     bgNum = 20;
   }
+  console.log(`bgNum:${bgNum}
+  randomNum:${randomNum}`);
   setBg();
 };
 next.addEventListener("click", getSlideNext);
@@ -117,7 +124,6 @@ async function getQuotes() {
   const data = await res.json();
 
  let n = Math.floor(Math.random() * 11);
- console.log(n);
   
   quote.textContent = `"${data[n].text}"`;
   author.textContent = `${data[n].author}`;
