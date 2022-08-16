@@ -55,17 +55,10 @@ greetingSpam.textContent = greetingText;
 // Background
 let randomNum;
 const getRandomNum = () => {
-  randomNum = Math.floor(Math.random() * 11 + 1).toString();
+  randomNum = Math.floor(Math.random() * 11 + 10).toString();
 };
 getRandomNum();
-let bgNum;
-const getBgNum = () => {
-  bgNum = randomNum.padStart(2, "0");
-};
-getBgNum();
-
-console.log(bgNum);
-bgNum = Number(bgNum)
+let bgNum = randomNum.padStart(2, "0");
 
 const setBg = () => {
   const img = new Image();
@@ -80,22 +73,18 @@ setBg();
 const getSlideNext = () => {
   if (bgNum < 20) {
     bgNum++;
-  } else if (bgNum > 19) {
-    bgNum = 1;
+  } else if (bgNum > 9) {
+    bgNum = 10;
   }
-  console.log(`bgNum:${bgNum}
-  randomNum:${randomNum}`);
   setBg();
 };
- 
+
 const getSlidePrev = () => {
-  if (bgNum > 1 && bgNum < 21) {
+  if (bgNum > 10 && bgNum < 21) {
     bgNum -= 1;
-  } else if (bgNum == 1) {
+  } else if (bgNum == 10) {
     bgNum = 20;
   }
-  console.log(`bgNum:${bgNum}
-  randomNum:${randomNum}`);
   setBg();
 };
 next.addEventListener("click", getSlideNext);
@@ -123,11 +112,21 @@ async function getQuotes() {
   const res = await fetch(quotes);
   const data = await res.json();
 
- let n = Math.floor(Math.random() * 11);
-  
+  let n = Math.floor(Math.random() * 11);
+
   quote.textContent = `"${data[n].text}"`;
   author.textContent = `${data[n].author}`;
 }
 getQuotes();
 
-changeQuote.addEventListener("click", getQuotes)
+changeQuote.addEventListener("click", getQuotes);
+
+// Sounds
+
+
+const song = document.querySelector('#song')
+const playPrev = document.querySelector('.play-prev')
+const playNext = document.querySelector('.play-next')
+const Play = document.querySelector('.play')
+const playList = document.querySelector('.play-list')
+
