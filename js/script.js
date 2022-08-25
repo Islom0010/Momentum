@@ -1,109 +1,121 @@
+const body = document.querySelector("body");
 const time = document.querySelector(".time");
 const date = document.querySelector(".date");
-const greeting = document.querySelector(".greeting-container");
-const greetingSpam = document.querySelector(".greeting");
-const greetingName = document.querySelector(".name");
-const body = document.querySelector("body");
-const prev = document.querySelector(".slide-prev");
-const next = document.querySelector(".slide-next");
-const city = document.querySelector(".city");
+const greeting = document.querySelector(".greeting");
+const name = document.querySelector(".name");
+const sliderNext = document.querySelector(".slide-next");
+const sliderPrev = document.querySelector(".slide-prev");
+const weatherError = document.querySelector(".weather-error");
 const weatherIcon = document.querySelector(".weather-icon");
 const temperature = document.querySelector(".temperature");
 const weatherDescription = document.querySelector(".weather-description");
-const changeQuote = document.querySelector(".change-quote");
+const wind = document.querySelector(".wind");
+const humidity = document.querySelector(".humidity");
+const city = document.querySelector(".city");
 const quote = document.querySelector(".quote");
-const author = document.querySelector(".author");
+const quoteAuthor = document.querySelector(".author");
+const btnChangeQuote = document.querySelector(".change-quote");
 
 // Time
-const newDate = new Date();
+let currentDate = new Date();
 
-const getTime = () => {
-  const newDate = new Date();
-  let currentTime = newDate.toLocaleTimeString();
-  return currentTime;
-};
-const getDate = () => {
-  const newDate = new Date();
-  let currentDate = newDate.toLocaleDateString();
-  return currentDate;
-};
-function showTime() {
-  time.textContent = getTime();
+const showTime = () => {
+  currentDate = new Date();
+  const options = {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  };
+  time.textContent = currentDate.toLocaleTimeString("en-US", options);
   setTimeout(showTime, 1000);
-}
+  showDate();
+};
 function showDate() {
-  date.textContent = getDate();
-  setTimeout(showDate, 1000);
+  currentDate = new Date();
+  const options = { weekday: "long", month: "long", day: "numeric" };
+  date.textContent = currentDate.toLocaleDateString("en-US", options);
 }
+const hours = currentDate.getHours();
+const timeOfDay = getTimeOfDay();
+const greetingText = `Good ${timeOfDay}`;
+greeting.textContent = greetingText;
+
 showTime();
-showDate();
 
 // Greeting
-const hours = newDate.getHours();
-const getTimeOfDay = () => {
+// const hours = currentDate.getHours();
+function getTimeOfDay() {
   if (hours < 6) return "night";
   else if (hours < 12) return "morning";
   else if (hours < 18) return "afternoon";
   else if (hours < 24) return "evening";
   else if (hours < 25) return "night";
-  setTimeout(getTimeOfDay, 1000);
-};
-const timeOfDay = getTimeOfDay();
-greetingText = `Good ${timeOfDay},`;
-greetingSpam.textContent = greetingText;
+}
 
 // Background
 let randomNum;
 const getRandomNum = () => {
-  randomNum = Math.floor(Math.random() * 11 + 10).toString();
+  randomNum = Math.floor(Math.random() * 19) + 1;
+  setBg()
 };
 getRandomNum();
-let bgNum = randomNum.padStart(2, "0");
 
-const setBg = () => {
+function setBg() {
+  let bgNum;
+  let timeOfDay = getTimeOfDay();
+  bgNum = randomNum < 10 ? "0" + randomNum : randomNum;
   const img = new Image();
-  img.src = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`;
+  let urlImage = `https://raw.githubusercontent.com/bajik/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`;
+  img.src = urlImage;
   img.onload = () => {
-    body.style.background = `url('${img.src}')`;
+    body.style.backgroundImage = "url(" + img.src + ")";
   };
-};
+}
 setBg();
 
 // body.style.background = `url("${bgUrl}")`;
-const getSlideNext = () => {
-  if (bgNum < 20) {
-    bgNum++;
-  } else if (bgNum > 9) {
-    bgNum = 10;
-  }
+function getSlideNext() {
+  randomNum = randomNum < 20 ? randomNum + 1 : 1;
   setBg();
-};
+}
 
-const getSlidePrev = () => {
-  if (bgNum > 10 && bgNum < 21) {
-    bgNum -= 1;
-  } else if (bgNum == 10) {
-    bgNum = 20;
-  }
+function getSlidePrev() {
+  randomNum = randomNum > 1 ? randomNum - 1 : 20;
   setBg();
-};
-next.addEventListener("click", getSlideNext);
-prev.addEventListener("click", getSlidePrev);
+}
+
+sliderNext.addEventListener("click", getSlideNext);
+sliderPrev.addEventListener("click", getSlidePrev);
 
 // Weather
 
-city.addEventListener("change", getWeather);
 async function getWeather() {
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.value}&lang=eng&appid=c27add33ef06ad17067ba5752f760c3b&units=metric`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.value}&appid=b249d67fef70757426186ad63ba0c6da&units=metric&lang=uk`;
   const res = await fetch(url);
   const data = await res.json();
-
-  weatherIcon.className = "weather-icon owf";
-  weatherIcon.classList.add(`owf-${data.weather[0].id}`);
-  temperature.textContent = `${data.main.temp}°C`;
-  weatherDescription.textContent = data.weather[0].description;
+  if (data.cod == "200") {
+    weatherError.textContent = "";
+    weatherIcon.className = "weather-icon owf";
+    weatherIcon.classList.add(`owf-${data.weather[0].id}`);
+    temperature.textContent = `${Math.round(data.main.temp)}°C`;
+    weatherDescription.textContent = data.weather[0].description;
+    humidity.textContent = `Humidity: ${Math.round(data.main.humidity)} %`;
+    wind.textContent = `Wind speed: ${Math.round(data.wind.speed)} m/s`;
+  } else {
+    weatherIcon.className = "weather-icon owf";
+    weatherError.textContent = `${data.cod}: ${data.message}`;
+    temperature.textContent = "";
+    weatherDescription.textContent = "";
+    humidity.textContent = "";
+    wind.textContent = "";
+  }
 }
 getWeather();
+function setCity(event) {
+  getWeather();
+  city.blur();
+}
 
 // Quotes
 
@@ -115,18 +127,16 @@ async function getQuotes() {
   let n = Math.floor(Math.random() * 11);
 
   quote.textContent = `"${data[n].text}"`;
-  author.textContent = `${data[n].author}`;
+  quoteAuthor.textContent = `${data[n].author}`;
 }
 getQuotes();
 
-changeQuote.addEventListener("click", getQuotes);
+btnChangeQuote.addEventListener("click", getQuotes);
 
 // Sounds
 
-
-const song = document.querySelector('#song')
-const playPrev = document.querySelector('.play-prev')
-const playNext = document.querySelector('.play-next')
-const Play = document.querySelector('.play')
-const playList = document.querySelector('.play-list')
-
+const song = document.querySelector("#song");
+const playPrev = document.querySelector(".play-prev");
+const playNext = document.querySelector(".play-next");
+const Play = document.querySelector(".play");
+const playList = document.querySelector(".play-list");
